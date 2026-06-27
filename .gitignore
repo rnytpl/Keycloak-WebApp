@@ -1,0 +1,6 @@
+# IDE local settings
+.vs/
+
+# .NET Build outputs
+bin/
+obj/

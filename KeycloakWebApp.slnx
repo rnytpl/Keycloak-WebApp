@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="KeycloakWebApp.Api/KeycloakWebApp.Api.csproj" />
+  <Project Path="KeycloakWebApp.Application/KeycloakWebApp.Application.csproj" />
+  <Project Path="KeycloakWebApp.Core/KeycloakWebApp.Core.csproj" />
+  <Project Path="KeycloakWebApp.Infrastructure/KeycloakWebApp.Infrastructure.csproj" />
+</Solution>
