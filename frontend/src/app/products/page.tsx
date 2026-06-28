@@ -5,7 +5,7 @@ import { ProductsClient } from "./ProductsClient";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductsPage() {
+const ProductsPage = async () => {
   const session = await getServerSession(authOptions);
   
   if (!session) {
@@ -41,4 +41,6 @@ export default async function ProductsPage() {
       </div>
     </main>
   );
-}
+};
+
+export default ProductsPage;

@@ -12,7 +12,7 @@ const Home = () => {
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
           Keycloak Web App
         </h1>
-        
+
         {status === "loading" && (
           <p className="text-lg text-muted-foreground">Loading session...</p>
         )}
@@ -39,7 +39,7 @@ const Home = () => {
               Welcome, {session.user?.name}!
             </p>
             <p className="text-sm text-muted-foreground break-all max-w-xl mx-auto">
-              Your Access Token: <br/>
+              Your Access Token: <br />
               <span className="font-mono bg-muted p-2 rounded block mt-2 max-h-32 overflow-y-auto">
                 {/* @ts-ignore */}
                 {session.accessToken}

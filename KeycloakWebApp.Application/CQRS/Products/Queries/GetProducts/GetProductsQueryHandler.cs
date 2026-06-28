@@ -1,5 +1,5 @@
 using Dapper;
-using KeycloakWebApp.Application.CQRS.Products.DTOs;
+using KeycloakWebApp.Application.Common.Models;
 using KeycloakWebApp.Application.Data;
 using MediatR;
 

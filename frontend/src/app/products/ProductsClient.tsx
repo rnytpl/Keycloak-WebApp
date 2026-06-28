@@ -94,8 +94,8 @@ export const ProductsClient = ({ initialProducts, roles, token }: ProductsClient
     <div className="space-y-4">
       {canCreate && (
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button>Create Product</Button>
+          <DialogTrigger render={<Button />}>
+            Create Product
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>

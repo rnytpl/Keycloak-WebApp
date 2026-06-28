@@ -5,9 +5,10 @@ import { UsersClient } from "./UsersClient";
 
 export const dynamic = "force-dynamic";
 
-export default async function UsersPage() {
+const UsersPage = async () => {
+
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect("/api/auth/signin");
   }
@@ -20,7 +21,7 @@ export default async function UsersPage() {
 
   // @ts-ignore
   const token = session.accessToken;
-  
+
   const res = await fetch("http://localhost:5212/api/users", {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -46,4 +47,6 @@ export default async function UsersPage() {
       </div>
     </main>
   );
-}
+};
+
+export default UsersPage;

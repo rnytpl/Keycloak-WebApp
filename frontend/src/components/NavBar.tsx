@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "./ui/button";
 
-export function NavBar() {
+export const NavBar = () => {
   const { data: session, status } = useSession();
 
   const handleSignOut = async () => {

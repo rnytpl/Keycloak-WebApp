@@ -1,4 +1,4 @@
-namespace KeycloakWebApp.Application.CQRS.Products.DTOs;
+namespace KeycloakWebApp.Application.Common.Models;
 
 public class ProductDto
 {

@@ -37,6 +37,7 @@ public class UsersController : ControllerBase
         try
         {
             var result = await _mediator.Send(command);
+
             return Ok(new { Message = result });
         }
         catch (Exception ex)
@@ -63,12 +64,12 @@ public class UsersController : ControllerBase
 
     [HttpPost("access-token")]
     [AllowAnonymous]
-    public async Task<ActionResult> GetAccessToken()
+    public async Task<ActionResult> GetAccessToken([FromBody] GetAccessTokenCommand command)
     {
 
-        var accessToken = await _mediator.Send(new GetAccessTokenCommandHandler());
+        await _mediator.Send(command);
 
-        return Ok(new { AccessToken = accessToken });
+        return Ok();
 
     }
 }

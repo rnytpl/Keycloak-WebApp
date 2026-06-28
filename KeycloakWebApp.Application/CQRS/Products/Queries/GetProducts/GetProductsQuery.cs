@@ -1,4 +1,4 @@
-using KeycloakWebApp.Application.CQRS.Products.DTOs;
+using KeycloakWebApp.Application.Common.Models;
 using MediatR;
 
 namespace KeycloakWebApp.Application.CQRS.Products.Queries.GetProducts;

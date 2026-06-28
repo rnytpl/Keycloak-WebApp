@@ -2,4 +2,4 @@
 
 namespace KeycloakWebApp.Application.CQRS.Identity.Commands.GetAccessToken;
 
-public record GetAccessTokenCommand(string? grantType, string? clientId, string? clientSecret, string username, string password) : IRequest<int>;
+public record GetAccessTokenCommand(string? grantType, string? clientId, string? clientSecret, string? username, string? password) : IRequest;

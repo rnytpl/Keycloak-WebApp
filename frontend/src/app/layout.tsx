@@ -19,12 +19,11 @@ export const metadata: Metadata = {
   description: "Next.js and ASP.NET Keycloak App",
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
-  return (
+}>) => (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
@@ -37,4 +36,4 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+export default RootLayout;

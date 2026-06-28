@@ -1,10 +1,12 @@
+using KeycloakWebApp.Application.Common.Models;
+using KeycloakWebApp.Application.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Configuration;
+using System.Buffers.Text;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using KeycloakWebApp.Application.Common.Models;
-using KeycloakWebApp.Application.Interfaces;
-using Microsoft.Extensions.Configuration;
 
 namespace KeycloakWebApp.Infrastructure.Identity;
 
@@ -29,7 +31,7 @@ public class KeycloakAdminService(HttpClient httpClient, IConfiguration configur
     private async Task<string> GetAccessTokenAsync()
     {
         var authority = configuration["Keycloak:Authority"]!;
-        var tokenEndpoint = $"{authority}/protocol/openid-connect/token";
+        var tokenEndpoint = $"{authority}/protocol/openid-connect/token1";
 
         var tokenRequest = new FormUrlEncodedContent(new[]
         {
@@ -40,21 +42,13 @@ public class KeycloakAdminService(HttpClient httpClient, IConfiguration configur
 
         var tokenResponse = await httpClient.PostAsync(tokenEndpoint, tokenRequest);
 
-
         var result = tokenResponse.EnsureSuccessStatusCode();
-
-        if (result.IsSuccessStatusCode != true)
-        {
-
-        }
 
         var tokenResult = await tokenResponse.Content.ReadFromJsonAsync<JsonElement>();
 
 
         return tokenResult.GetProperty("access_token").GetString()!;
     }
-
-
     /// <summary>
     /// This method is responsible for obtaining an access token from Keycloak using the client credentials flow. 
     /// It constructs a request to the token endpoint of Keycloak, including the necessary parameters such as grant type, client ID, and client secret. 
@@ -92,7 +86,6 @@ public class KeycloakAdminService(HttpClient httpClient, IConfiguration configur
                 new { type = "password", value = userDto.Password, temporary = false }
             }
         };
-
 
         using var request = new HttpRequestMessage(HttpMethod.Post, adminApiUrl);
 
@@ -138,6 +131,7 @@ public class KeycloakAdminService(HttpClient httpClient, IConfiguration configur
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
         var response = await httpClient.SendAsync(request);
+
         response.EnsureSuccessStatusCode();
 
         var usersArray = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -176,6 +170,17 @@ public class KeycloakAdminService(HttpClient httpClient, IConfiguration configur
         }
 
         return result;
+    }
+
+    public async Task<UserDto> GetUserByParameter(string parameter) {
+
+        var authority = configuration["Keycloak:Authority"];
+        //{ { baseUrl} }/ admin / realms /{ { realm} }/ users /{ { user_id} }
+        var url = authority.Replace("/realms/", "/admin/realms/users/" + parameter);
+        var accessToken = GetAccessTokenAsync();
+
+
+        throw new Exception();
     }
 
     public async Task AssignRoleAsync(string userId, string roleName)
@@ -229,4 +234,6 @@ public class KeycloakAdminService(HttpClient httpClient, IConfiguration configur
         var removeResponse = await httpClient.SendAsync(removeRequest);
         removeResponse.EnsureSuccessStatusCode();
     }
+
+
 }
