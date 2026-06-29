@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 const Home = () => {
@@ -41,7 +41,7 @@ const Home = () => {
             <p className="text-sm text-muted-foreground break-all max-w-xl mx-auto">
               Your Access Token: <br />
               <span className="font-mono bg-muted p-2 rounded block mt-2 max-h-32 overflow-y-auto">
-                {/* @ts-ignore */}
+                {/* @ts-expect-error custom session type */}
                 {session.accessToken}
               </span>
             </p>

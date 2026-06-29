@@ -6,6 +6,7 @@ public interface IIdentityService
 {
     Task<string> RegisterUserAsync(UserRegistrationDto userDto);
     Task<IEnumerable<UserDto>> GetUsersAsync();
+    Task<UserDto> GetUserByParameterAsync(string parameter);
     Task AssignRoleAsync(string userId, string roleName);
     Task RemoveRoleAsync(string userId, string roleName);
 }

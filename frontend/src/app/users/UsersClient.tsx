@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -88,7 +89,11 @@ export const UsersClient = ({ initialUsers, roles, token }: UsersClientProps) =>
         <TableBody>
           {users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell className="font-medium">{user.username}</TableCell>
+              <TableCell className="font-medium">
+                <Link href={`/users/${user.id}`} className="hover:underline text-primary">
+                  {user.username}
+                </Link>
+              </TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
@@ -107,11 +112,9 @@ export const UsersClient = ({ initialUsers, roles, token }: UsersClientProps) =>
               {isAdmin && (
                 <TableCell className="text-right">
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                    <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0" />}>
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       {!user.roles?.includes("admin") && (

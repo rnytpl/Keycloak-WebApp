@@ -8,7 +8,7 @@ export const NavBar = () => {
   const { data: session, status } = useSession();
 
   const handleSignOut = async () => {
-    // @ts-ignore
+    // @ts-expect-error custom session custom session type
     const idToken = session?.idToken;
     
     await signOut({ redirect: false });
@@ -38,7 +38,7 @@ export const NavBar = () => {
                 <Link href="/products" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                   Products
                 </Link>
-                {/* @ts-ignore */}
+                {/* @ts-expect-error custom session */}
                 {(session?.roles?.includes("admin") || session?.roles?.includes("moderator")) && (
                   <Link href="/users" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                     Users
@@ -59,8 +59,8 @@ export const NavBar = () => {
                 </Button>
               </>
             ) : status === "unauthenticated" ? (
-              <Button asChild size="sm">
-                <Link href="/api/auth/signin">Log in</Link>
+              <Button render={<Link href="/api/auth/signin" />} size="sm">
+                Log in
               </Button>
             ) : null}
           </div>

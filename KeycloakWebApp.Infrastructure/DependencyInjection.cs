@@ -19,7 +19,6 @@ public static class DependencyInjection
         return new InfrastructureBuilder(services, configuration);
     }
 
-
     public class InfrastructureBuilder(IServiceCollection services, IConfiguration configuration)
     {
         public InfrastructureBuilder AddDatabase()
@@ -31,8 +30,34 @@ public static class DependencyInjection
 
         public InfrastructureBuilder AddKeycloak()
         {
+            services.AddMemoryCache();
 
-            services.AddHttpClient<IIdentityService, KeycloakAdminService>();
+            // A client strictly dedicated for fetching auth token
+            services.AddHttpClient("KeycloakTokenClient", client =>
+            {
+                var authority = configuration["Keycloak:Authority"];
+                var realm = configuration["Keycloak:Realm"];
+
+                client.BaseAddress = new Uri($"{authority}/realms/{realm}/protocol/openid-connect/token");
+
+                client.Timeout = TimeSpan.FromSeconds(15);
+            });
+
+            // A handler that intercepts requests to inject the token
+
+            services.AddTransient<KeycloakAuthHeaderHandler>();
+
+            services.AddHttpClient<IIdentityService, KeycloakAdminService>(client =>
+            {
+                var authority = configuration["Keycloak:Authority"];
+                var realm = configuration["Keycloak:Realm"];
+
+                client.BaseAddress = new Uri(authority + $"/admin/realms/{realm}/");
+                client.Timeout = TimeSpan.FromSeconds(30);
+
+                // 
+            })
+            .AddHttpMessageHandler<KeycloakAuthHeaderHandler>();
 
             return this;
         }
@@ -45,7 +70,7 @@ public static class DependencyInjection
                 .AddJwtBearer(options =>
                 {
                     options.Authority = configuration["Keycloak:Authority"];
-                    options.MetadataAddress = configuration["Keycloak:MetadataAddress"];
+                    options.MetadataAddress = configuration["Keycloak:MetadataAddress"]!;
                     options.Audience = configuration["Keycloak:Audience"];
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters

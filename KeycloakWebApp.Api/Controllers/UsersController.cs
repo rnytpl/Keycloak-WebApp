@@ -3,6 +3,7 @@ using KeycloakWebApp.Application.CQRS.Identity.Commands.GetAccessToken;
 using KeycloakWebApp.Application.CQRS.Users.Commands.AssignRole;
 using KeycloakWebApp.Application.CQRS.Users.Commands.RegisterUser;
 using KeycloakWebApp.Application.CQRS.Users.Commands.RemoveRole;
+using KeycloakWebApp.Application.CQRS.Users.Queries.GetUserByParameter;
 using KeycloakWebApp.Application.CQRS.Users.Queries.GetUsers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,6 +29,15 @@ public class UsersController : ControllerBase
         var users = await _mediator.Send(new GetUsersQuery());
 
         return Ok(users);
+    }
+
+    [HttpGet("{parameter}")]
+    [Authorize(Roles = "admin,moderator")]
+    public async Task<ActionResult<UserDto>> GetUserByParameter(string parameter)
+    {
+        var user = await _mediator.Send(new GetUserByParameterCommand(parameter));
+
+        return Ok(user);
     }
 
     [HttpPost("register")]

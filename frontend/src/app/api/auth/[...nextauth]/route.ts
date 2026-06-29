@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
             const jsonPayload = Buffer.from(base64, 'base64').toString('utf-8');
             const payload = JSON.parse(jsonPayload);
             token.roles = payload.realm_access?.roles || [];
-          } catch (e) {
+          } catch {
             token.roles = [];
           }
         }
@@ -32,11 +32,11 @@ export const authOptions: NextAuthOptions = {
 
     },
     async session({ session, token }) {
-      // @ts-ignore
+      // @ts-expect-error session augmentation
       session.accessToken = token.accessToken;
-      // @ts-ignore
+      // @ts-expect-error session augmentation
       session.idToken = token.idToken;
-      // @ts-ignore
+      // @ts-expect-error session augmentation
       session.roles = token.roles || [];
       return session;
     },

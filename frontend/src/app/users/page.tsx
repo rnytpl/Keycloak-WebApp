@@ -13,13 +13,13 @@ const UsersPage = async () => {
     redirect("/api/auth/signin");
   }
 
-  // @ts-ignore
+  // @ts-expect-error custom session type
   const roles = session.roles || [];
   if (!roles.includes("admin") && !roles.includes("moderator")) {
     return <div className="p-8 text-center text-red-500">You do not have permission to view users.</div>;
   }
 
-  // @ts-ignore
+  // @ts-expect-error custom session type
   const token = session.accessToken;
 
   const res = await fetch("http://localhost:5212/api/users", {
@@ -30,6 +30,9 @@ const UsersPage = async () => {
   });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      redirect("/api/auth/signin");
+    }
     return <div className="p-8 text-center text-red-500">Failed to load users.</div>;
   }
 

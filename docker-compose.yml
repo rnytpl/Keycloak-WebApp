@@ -45,6 +45,8 @@ services:
       - postgres
     networks:
       - keycloak_network
+    volumes:
+      - ./keycloak-custom-theme:/opt/keycloak/themes/keycloak-custom-theme
 
 volumes:
   postgres_data:

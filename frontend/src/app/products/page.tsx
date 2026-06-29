@@ -12,7 +12,7 @@ const ProductsPage = async () => {
     redirect("/api/auth/signin");
   }
 
-  // @ts-ignore
+  // @ts-expect-error custom session type
   const token = session.accessToken;
   
   const res = await fetch("http://localhost:5212/api/products", {
@@ -27,7 +27,7 @@ const ProductsPage = async () => {
   }
 
   const products = await res.json();
-  // @ts-ignore
+  // @ts-expect-error custom session type
   const roles = session.roles || [];
 
   return (
