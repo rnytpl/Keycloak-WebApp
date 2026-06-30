@@ -1,3 +1,4 @@
+using KeycloakWebApp.Application.Common;
 using KeycloakWebApp.Application.Common.Models;
 using KeycloakWebApp.Application.Interfaces;
 using System.Net.Http.Json;
@@ -32,7 +33,7 @@ public class KeycloakAdminService(HttpClient httpClient) : IIdentityService
         {
             var error = await response.Content.ReadAsStringAsync();
 
-            throw new Exception($"Failed to create user in Keycloak: {response.StatusCode} - {error}");
+            throw new Exception($"{Messages.FailedToCreateUser} - {response.StatusCode} - {error}");
         }
 
         var location = response.Headers.Location?.ToString();
@@ -40,7 +41,7 @@ public class KeycloakAdminService(HttpClient httpClient) : IIdentityService
         // Redirect the user to the email verification page if the location header is present
         if (location != null)
         {
-            var redirectUri = Uri.EscapeDataString("http://localhost:3000/api/auth/signin");
+            var redirectUri = Uri.EscapeDataString("http://localhost:3000/api/auth/signin/keycloak");
 
             var clientId = "nextjs-client";
 
@@ -97,12 +98,12 @@ public class KeycloakAdminService(HttpClient httpClient) : IIdentityService
         return result;
     }
 
-    public async Task<UserDto> GetUserByParameterAsync(string parameter)
+    public async Task<Result<UserDto>> GetUserByParameterAsync(string parameter)
     {
         using var result = await httpClient.GetAsync($"users/{parameter}");
 
         if (!result.IsSuccessStatusCode)
-            throw new Exception("User not found");
+            return Result<UserDto>.Fail($"{Messages.UserNotFound} error: {result.ReasonPhrase}");
 
 
         var user = await result.Content.ReadFromJsonAsync<JsonElement>();
@@ -131,8 +132,10 @@ public class KeycloakAdminService(HttpClient httpClient) : IIdentityService
             }
         }
 
+        var userDto = new UserDto(id, username, email, firstName, lastName, enabled, roles.ToArray());
+
         // 4. Return the mapped DTO
-        return new UserDto(id, username, email, firstName, lastName, enabled, roles.ToArray());
+        return Result<UserDto>.Ok(userDto);
     }
 
     public async Task AssignRoleAsync(string userId, string roleName)
@@ -171,8 +174,44 @@ public class KeycloakAdminService(HttpClient httpClient) : IIdentityService
             Content = new StringContent($"[{roleJson}]", Encoding.UTF8, "application/json")
         };
 
+
         using var removeResponse = await httpClient.SendAsync(removeRequest);
 
         removeResponse.EnsureSuccessStatusCode();
     }
+
+    public async Task<Result> ResetPasswordEmailAsync(string Email)
+    {
+        // 1. Search for the user by email
+        using var searchResult = await httpClient.GetAsync($"users?email={Email}&exact=true");
+        
+        if (!searchResult.IsSuccessStatusCode)
+            return Result.Ok(); // Return OK to prevent user enumeration if Keycloak throws an error
+
+        var usersArray = await searchResult.Content.ReadFromJsonAsync<JsonElement>();
+
+        // 2. If user doesn't exist, return Ok to prevent user enumeration
+        if (usersArray.GetArrayLength() == 0)
+            return Result.Ok();
+
+        var userId = usersArray[0].GetProperty("id").GetString()!;
+
+        string[] actions = { "UPDATE_PASSWORD" };
+
+        var redirectUrl = Uri.EscapeDataString("http://localhost:3000/api/auth/signin/keycloak");
+        var clientId = "nextjs-client";
+
+        // 3. Trigger the email
+        using var response = await httpClient.PutAsJsonAsync($"users/{userId}/execute-actions-email?redirect_uri={redirectUrl}&client_id={clientId}", actions);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var err = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Failed to trigger email: {response.StatusCode} - {err}");
+        }
+
+        return Result.Ok();
+    }
 }
+
+// he redirectUri and clientId parameters are optional. The default for the redirect is the account client. This endpoint has been deprecated. Please use the execute-actions-email passing a list with UPDATE_PASSWORD within it.

@@ -16,6 +16,7 @@ This document details the finalized architecture and technology stack for the Ke
   - **Queries (Read)**: Handled via MediatR. Bypasses Repositories entirely. Dapper queries directly map database rows to flat Read Models (DTOs) for maximum performance.
 - **Dapper**: Lightweight micro-ORM used across the application.
   - *Note*: We explicitly avoid a rigid "Unit of Work" and "Generic Repository" over Dapper, as Dapper does not feature change tracking. Instead, `IDbTransaction` management is handled within MediatR Pipeline Behaviors for commands that require transactions.
+- **Performance Optimization**: Resolves N+1 query problems when aggregating Keycloak data (e.g., fetching users and their associated roles) by utilizing parallel asynchronous processing (`Task.WhenAll`) via the Keycloak Admin API.
 - **Fluent Dependency Injection**: DI registrations are encapsulated in extension methods per layer (e.g., `AddInfrastructure`, `AddApplication`) for clean configuration.
 - **CORS Configuration**: The `.NET` API explicitly configures Cross-Origin Resource Sharing (CORS) to safely accept frontend requests (e.g., from `http://localhost:3000`) and prevent preflight errors.
 - **Clean Boilerplate**: No default weather forecast controllers or unnecessary boilerplate code.
@@ -25,6 +26,7 @@ This document details the finalized architecture and technology stack for the Ke
 ### Core Technologies
 - **React & Next.js**: Modern web application framework leveraging the App Router and React Server Components for native data fetching, server-side rendering, and built-in caching (`fetch` API), avoiding heavy client-side state libraries.
 - **Auth.js (formerly NextAuth.js)**: Integrated with the Keycloak provider to securely handle OIDC flows, manage sessions, and automatically refresh tokens via HttpOnly cookies. It also robustly extracts Keycloak `realm_access.roles` by securely decoding the JWT `access_token` within the NextAuth callback.
+- **Streamlined Authentication**: Bypasses the default, generic NextAuth sign-in page by routing protected application routes and login buttons directly to `/api/auth/signin/keycloak`, initiating an immediate OAuth flow for a seamless Single Sign-On (SSO) experience.
 - **Global Navigation System**: A persistent `NavBar` component injected into the Next.js Layout dynamically renders secure application routes (`/products`, `/users`) depending strictly on the user's active session roles.
 - **Federated Logout**: Logouts are explicitly federated back to Keycloak using `id_token_hint` parameters, guaranteeing that ending a Next.js session natively terminates the upstream Keycloak session.
 
@@ -48,14 +50,16 @@ This document details the finalized architecture and technology stack for the Ke
   - Arrow functions with implicit returns used where appropriate (primarily for presentational components without complex hooks).
   - No unnecessary boilerplate code.
 
-## 3. Identity & User Registration
+## 4. Identity & User Registration
 
 - **Custom Registration Flow**: Rather than using Keycloak's native login-screen registration, the application implements a fully custom registration flow across both the frontend and backend.
 - **Frontend Registration**: A dedicated Next.js registration page using Shadcn UI captures user details and submits them to the `.NET` API.
 - **Backend Integration**: The `.NET` API utilizes a Keycloak service account (`backend-client` with Client Credentials grant) to authenticate securely. It leverages the Keycloak Admin REST API to programmatically create the user and configure credentials.
 - **Mandatory Email Verification**: New users are created with `emailVerified = false` and assigned the `VERIFY_EMAIL` required action. Upon creation, the `.NET` API instantly triggers Keycloak's `execute-actions-email` endpoint (including a `redirect_uri` back to the application), ensuring the verification email is immediately dispatched via Keycloak's SMTP transport.
+- **Forgot Password Flow**: Implements a custom "Forgot Password" UI that communicates with the `.NET` backend. The backend securely triggers Keycloak's `UPDATE_PASSWORD` email action. The API deliberately returns a generic success response regardless of whether the email exists, mitigating User Enumeration attacks.
 
-## 4. Infrastructure & Development Workflow
+## 5. Infrastructure & Development Workflow
 
 - **Docker Containerization**: The local development environment uses Docker to orchestrate PostgreSQL, PgAdmin4, and Keycloak.
+- **Native Keycloak Theming**: A custom Keycloak login page theme is implemented using native HTML/CSS and FreeMarker templates (`.ftl`). The theme is injected directly into the Keycloak container via Docker volumes, avoiding the overhead of third-party React-based theme compilers (like Keycloakify).
 - **Local SMTP Testing**: A local **Mailpit** Docker container is strictly bridged into the Keycloak network. Keycloak's SMTP settings are mapped to Mailpit, safely catching all outgoing verification and identity emails so developers can preview them natively without configuring external SMTP providers.

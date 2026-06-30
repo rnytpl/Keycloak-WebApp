@@ -9,7 +9,7 @@ const ProductsPage = async () => {
   const session = await getServerSession(authOptions);
   
   if (!session) {
-    redirect("/api/auth/signin");
+    redirect("/api/auth/signin/keycloak");
   }
 
   // @ts-expect-error custom session type

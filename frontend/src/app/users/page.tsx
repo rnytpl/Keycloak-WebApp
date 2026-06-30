@@ -10,7 +10,7 @@ const UsersPage = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/api/auth/signin");
+    redirect("/api/auth/signin/keycloak");
   }
 
   // @ts-expect-error custom session type
@@ -31,7 +31,7 @@ const UsersPage = async () => {
 
   if (!res.ok) {
     if (res.status === 401) {
-      redirect("/api/auth/signin");
+      redirect("/api/auth/signin/keycloak");
     }
     return <div className="p-8 text-center text-red-500">Failed to load users.</div>;
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signOut, signIn } from "next-auth/react";
 import { Button } from "./ui/button";
 
 export const NavBar = () => {
@@ -59,7 +59,7 @@ export const NavBar = () => {
                 </Button>
               </>
             ) : status === "unauthenticated" ? (
-              <Button render={<Link href="/api/auth/signin" />} size="sm">
+              <Button onClick={() => signIn("keycloak")} size="sm">
                 Log in
               </Button>
             ) : null}

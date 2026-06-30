@@ -1,5 +1,6 @@
 using KeycloakWebApp.Application.Common.Models;
 using KeycloakWebApp.Application.CQRS.Identity.Commands.GetAccessToken;
+using KeycloakWebApp.Application.CQRS.Identity.Commands.ResetPassword;
 using KeycloakWebApp.Application.CQRS.Users.Commands.AssignRole;
 using KeycloakWebApp.Application.CQRS.Users.Commands.RegisterUser;
 using KeycloakWebApp.Application.CQRS.Users.Commands.RemoveRole;
@@ -13,20 +14,15 @@ namespace KeycloakWebApp.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class UsersController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
 
-    public UsersController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
 
     [HttpGet]
     [Authorize(Roles = "admin,moderator")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
     {
-        var users = await _mediator.Send(new GetUsersQuery());
+        var users = await mediator.Send(new GetUsersQuery());
 
         return Ok(users);
     }
@@ -35,7 +31,7 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "admin,moderator")]
     public async Task<ActionResult<UserDto>> GetUserByParameter(string parameter)
     {
-        var user = await _mediator.Send(new GetUserByParameterCommand(parameter));
+        var user = await mediator.Send(new GetUserByParameterCommand(parameter));
 
         return Ok(user);
     }
@@ -46,7 +42,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var result = await _mediator.Send(command);
+            var result = await mediator.Send(command);
 
             return Ok(new { Message = result });
         }
@@ -60,7 +56,7 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> AssignRole(string id, [FromBody] string roleName)
     {
-        await _mediator.Send(new AssignRoleCommand(id, roleName));
+        await mediator.Send(new AssignRoleCommand(id, roleName));
         return NoContent();
     }
 
@@ -68,18 +64,28 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> RemoveRole(string id, string roleName)
     {
-        await _mediator.Send(new RemoveRoleCommand(id, roleName));
+        await mediator.Send(new RemoveRoleCommand(id, roleName));
         return NoContent();
     }
 
-    [HttpPost("access-token")]
+    //[HttpPost("access-token")]
+    //[AllowAnonymous]
+    //public async Task<ActionResult> GetAccessToken([FromBody] GetAccessTokenCommand command)
+    //{
+
+    //    await mediator.Send(command);
+
+    //    return Ok();
+
+    //}
+
+    [HttpPut("forgot-password")]
     [AllowAnonymous]
-    public async Task<ActionResult> GetAccessToken([FromBody] GetAccessTokenCommand command)
+    public async Task<ActionResult> ResetPassword(string email)
     {
 
-        await _mediator.Send(command);
+        await mediator.Send(new ResetPasswordCommand(email));
 
         return Ok();
-
     }
 }

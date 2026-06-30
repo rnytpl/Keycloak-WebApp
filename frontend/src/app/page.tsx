@@ -30,6 +30,11 @@ const Home = () => {
                 Register Account
               </Button>
             </div>
+            <div className="pt-2">
+              <Button variant="link" className="text-muted-foreground hover:text-foreground" onClick={() => window.location.href = "/forgot-password"}>
+                Forgot your password?
+              </Button>
+            </div>
           </div>
         )}
 

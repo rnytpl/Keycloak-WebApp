@@ -19,7 +19,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/api/auth/signin");
+    redirect("/api/auth/signin/keycloak");
   }
 
   // @ts-expect-error custom session augmentation
@@ -36,7 +36,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
 
   if (!res.ok) {
     if (res.status === 401) {
-      redirect("/api/auth/signin");
+      redirect("/api/auth/signin/keycloak");
     }
     if (res.status === 404) {
         return <div className="p-8 text-center text-red-500">User not found.</div>;
