@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddApplication();
+
 builder.Services
         .AddInfrastructure(builder.Configuration)
         .AddAuthenticationAndAuthorization()

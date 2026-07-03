@@ -70,7 +70,7 @@ public class KeycloakAdminService(HttpClient httpClient) : IIdentityService
 
             using var roleResponse = await httpClient.GetAsync($"users/{userId}/role-mappings/realm");
 
-            var roles = new List<string>();
+            var roles = new HashSet<string>();
 
             if (roleResponse.IsSuccessStatusCode)
             {
@@ -184,7 +184,7 @@ public class KeycloakAdminService(HttpClient httpClient) : IIdentityService
     {
         // 1. Search for the user by email
         using var searchResult = await httpClient.GetAsync($"users?email={Email}&exact=true");
-        
+
         if (!searchResult.IsSuccessStatusCode)
             return Result.Ok(); // Return OK to prevent user enumeration if Keycloak throws an error
 

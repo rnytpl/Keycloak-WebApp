@@ -170,6 +170,72 @@ a:hover {
     color: #991b1b;
 }
 
-.pf-c-button.pf-m-control {
+#kc-locale .pf-c-button.pf-m-control {
     display: none;
+}
+
+/* Social Providers (Google, etc.) */
+#kc-social-providers {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+#kc-social-providers h2, #kc-social-providers h4 {
+    font-size: 0.875rem;
+    color: #475569;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    margin-top: 0;
+}
+
+#kc-social-providers ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#kc-social-providers a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #0f172a;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+#kc-social-providers i {
+    font-style: normal;
+    font-size: 1.1rem;
+}
+
+/* Specific Google Styling */
+#kc-social-providers a.google,
+#kc-social-providers a[id*="google"] {
+    background-color: #4285F4;
+    color: #ffffff;
+    border: 1px solid #4285F4;
+}
+
+#kc-social-providers a.google:hover,
+#kc-social-providers a[id*="google"]:hover {
+    background-color: #3367D6;
+    border-color: #3367D6;
+    color: #ffffff;
+}
+
+#kc-social-providers a:hover {
+    background-color: #f8fafc;
+    text-decoration: none;
 }

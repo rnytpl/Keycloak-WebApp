@@ -68,17 +68,6 @@ public class UsersController(IMediator mediator) : ControllerBase
         return NoContent();
     }
 
-    //[HttpPost("access-token")]
-    //[AllowAnonymous]
-    //public async Task<ActionResult> GetAccessToken([FromBody] GetAccessTokenCommand command)
-    //{
-
-    //    await mediator.Send(command);
-
-    //    return Ok();
-
-    //}
-
     [HttpPut("forgot-password")]
     [AllowAnonymous]
     public async Task<ActionResult> ResetPassword(string email)
@@ -87,5 +76,17 @@ public class UsersController(IMediator mediator) : ControllerBase
         await mediator.Send(new ResetPasswordCommand(email));
 
         return Ok();
+    }
+
+    [Obsolete("To be fixed or removed later")]
+    [HttpPost("access-token")]
+    [AllowAnonymous]
+    public async Task<ActionResult> GetAccessToken([FromBody] GetAccessTokenCommand command)
+    {
+
+        await mediator.Send(command);
+
+        return Ok();
+
     }
 }
